@@ -1,0 +1,171 @@
+PS C:\DARKWEB\xamp2\htdocs> php artisan db:seed --class=UserSeeder
+
+   INFO  Seeding database.
+
+Starting to seed roles and users...
+Admin and Vendor roles created successfully.
+admin user created successfully:
+Username: Admin
+Password: Admin@123456
+Mnemonic: horn august foster sorry settle tilt margin exit guard forum ahead during
+Reference ID: G9Z9119F393CIAVF
+Role: Admin
+---
+vendor user created successfully:
+Username: Vendor
+Password: Vendor@123456
+Mnemonic: average fantasy club security witness square bargain spoil story stamp glass will
+Reference ID: D5W694Z1JK87ULU5
+Role: Vendor
+---
+user user created successfully:
+Username: User
+Password: User@123456
+Mnemonic: bronze feel relax cotton bachelor copper case list celery cereal turn casino
+Reference ID: GD08BZ545XV3SV05
+Role: User
+---
+Random vendor user created successfully:
+Username: vendor1
+Password: u?j9S1~@
+Mnemonic: brown pepper someone ready inner riot loud phrase clown gentle super warrior
+Reference ID: 0P9T6U3JMLW501V2
+Role: Vendor
+---
+Random vendor user created successfully:
+Username: vendor2
+Password: 5~rG^pcy
+Mnemonic: piano glide glance below wreck coin sponsor drop target jump liberty bleak
+Reference ID: 60C74OINUB921J7X
+Role: Vendor
+---
+Random vendor user created successfully:
+Username: vendor3
+Password: gI.d>|2O
+Mnemonic: grab taste gas peasant air cry guilt bomb remain number hamster quiz
+Reference ID: 753V9Q4PN9H7MFN4
+Role: Vendor
+---
+Random vendor user created successfully:
+Username: vendor4
+Password: QDo?gyU1
+Mnemonic: material price traffic cream sketch mobile easily seek artefact slush purchase hole
+Reference ID: C0GV110EGY61Q69O
+Role: Vendor
+---
+Random vendor user created successfully:
+Username: vendor5
+Password: /MiWDZJ2
+Mnemonic: multiply almost hurt shock fun sister upper distance enlist holiday clerk pitch
+Reference ID: 9N2VFGU7447NG4S6
+Role: Vendor
+---
+Random vendor user created successfully:
+Username: vendor6
+Password: CNj|x8$6
+Mnemonic: anger weasel speak sword moral repair about history reject master better hazard
+Reference ID: 098Z7QR76OCOA76H
+Role: Vendor
+---
+Random vendor user created successfully:
+Username: vendor7
+Password: 4|X$WChn
+Mnemonic: enter world price scissors pretty habit forward fury pioneer scorpion nephew board
+Reference ID: B077335A31OHIUDL
+Role: Vendor
+---
+Random vendor user created successfully:
+Username: vendor8
+Password: Vnn\ihb6
+Mnemonic: page envelope sweet learn guide color palace grit key copper victory congress
+Reference ID: 7U42N1NEBMB7M378
+Role: Vendor
+---
+Random vendor user created successfully:
+Username: vendor9
+Password: ,weA-0EN
+Mnemonic: copper already boost word mammal plunge shock story amused guess jar screen
+Reference ID: TGB1BTO6876LP671
+Role: Vendor
+---
+Random vendor user created successfully:
+Username: vendor10
+Password: $NZ9ho!_
+Mnemonic: beauty awake version ugly express virus such cotton cup bachelor only near
+Reference ID: K73F20Z2U8PH1A6T
+Role: Vendor
+---
+Random regular user created successfully:
+Username: user1
+Password: 2y~K1t#)
+Mnemonic: elephant dwarf train symbol february tobacco timber utility approve achieve exercise media
+Reference ID: F6155QX88BBM2VH6
+Role: Regular User
+---
+Random regular user created successfully:
+Username: user2
+Password: LZcB5[9</info>
+Mnemonic: ugly divide sphere credit advance club advice violin cash family hill garden
+Reference ID: 8G56KZ6X6Y6EL12Y
+Role: Regular User
+---
+Random regular user created successfully:
+Username: user3
+Password: 7Amwl:Un
+Mnemonic: crew glance vanish civil narrow over art burger diary win train way
+Reference ID: 4X1W066HQQ0W08IY
+Role: Regular User
+---
+Random regular user created successfully:
+Username: user4
+Password: i-k{D;5$
+Mnemonic: canvas limit welcome estate deputy purchase start glide license crouch bracket decorate
+Reference ID: 1IUO1I6S6692UFW8
+Role: Regular User
+---
+Random regular user created successfully:
+Username: user5
+Password: 0o,oYD0j
+Mnemonic: share eyebrow title mirror square awkward awake village lady maid language spread
+Reference ID: 9W2PH7DHB98ZX542
+Role: Regular User
+---
+Random regular user created successfully:
+Username: user6
+Password: Y!}vs7gm
+Mnemonic: various search vendor brave work theme secret lab enact spare learn fire
+Reference ID: M42083JUGH5Z1NH7
+Role: Regular User
+---
+Random regular user created successfully:
+Username: user7
+Password: 1x@G)0RN
+Mnemonic: bicycle amount fiber machine toe combine illness select route lounge twelve broken
+Reference ID: 45HTWYIFC72L8586
+Role: Regular User
+---
+Random regular user created successfully:
+Username: user8
+Password: Oc0m_J0I
+Mnemonic: cargo pupil festival come clump people actual craft audit enact fiction between
+Reference ID: 13NXO567L19YUPI7
+Role: Regular User
+---
+Random regular user created successfully:
+Username: user9
+Password: #Xe8O59^
+Mnemonic: undo kiwi tag say letter tell limit symptom side gas skill behind
+Reference ID: 4928OBKQJ9V9YV12
+Role: Regular User
+---
+Random regular user created successfully:
+Username: user10
+Password: Kfw7`lzL
+Mnemonic: ankle click disorder gate issue thumb foam proof behave bright pen child
+Reference ID: 57LA88N068TLMQ0P
+Role: Regular User
+---
+Seeding completed.
+Successfully created users: 23
+Failed to create users: 0
+PS C:\DARKWEB\xamp2\htdocs> 
