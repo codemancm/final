@@ -11,48 +11,19 @@ use Exception;
 
 class DashboardController extends Controller
 {
-    public function index($username = null)
+    public function index()
     {
-        try {
-            $loggedInUser = Auth::user();
-            
-            if (!$loggedInUser) {
-                Log::error('Unauthenticated user tried to access dashboard');
-                return redirect()->route('login')->with('error', 'Please login to access the dashboard.');
-            }
+        $user = Auth::user();
 
-            if ($username) {
-                $user = User::where('username', $username)->firstOrFail();
-            } else {
-                $user = $loggedInUser;
-            }
-
-            $profile = $user->profile;
-
-            if (!$profile) {
-                Log::info('Creating profile for user', ['user_id' => $user->id]);
-                $profile = $user->profile()->create();
-            }
-
-            $pgpKey = $user->pgpKey;
-
-            // Determine user role
-            $userRole = $this->determineUserRole($user);
-
-            $isOwnProfile = $user->id === $loggedInUser->id;
-
-            // Determine what information to show based on user roles and ownership
-            $showFullInfo = $isOwnProfile || $loggedInUser->isAdmin();
-
-            // Decrypt the description if it exists, otherwise set a default message
-            $description = $profile->description ? Crypt::decryptString($profile->description) : "This user hasn't added a description yet.";
-
-            return view('dashboard', compact('user', 'profile', 'pgpKey', 'userRole', 'isOwnProfile', 'showFullInfo', 'description'));
-
-        } catch (Exception $e) {
-            Log::error('Error loading dashboard: ' . $e->getMessage(), ['user_id' => Auth::id()]);
-            return redirect()->route('home')->with('error', 'An error occurred while loading the dashboard. Please try again.');
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.index');
         }
+
+        if ($user->hasRole('vendor')) {
+            return redirect()->route('vendor.index');
+        }
+
+        return view('dashboard', compact('user'));
     }
 
     private function determineUserRole(User $user): string

@@ -228,11 +228,11 @@ padding:40px 20px
 }
 
 .footer {
-background-color:#1e1e1e;
-color:#e0e0e0;
-text-align:center;
-padding:20px 0;
-border-top:2px solid #bb86fc
+    background-color: #212529;
+    color: #f8f9fa;
+    text-align: center;
+    padding: 20px 0;
+    border-top: 2px solid #ffc107;
 }
 
 .footer-container {

@@ -1,51 +1,73 @@
-@extends('layouts.app')
-@section('content')
-<div class="a-v-panel-container">
-    <div class="a-v-panel-card">
-        <h1 class="a-v-panel-title">Vendor Panel</h1>
-        <p class="a-v-panel-welcome">Welcome to the Vendor Panel. Here you can manage your products in {{ config('app.name') }}.</p>     
-        <div class="a-v-panel-grid">
-            <div class="a-v-panel-item">
-                <h3 class="a-v-panel-item-title">Add Digital Product</h3>
-                <p class="a-v-panel-item-description">You can add digital products to {{ config('app.name') }}.</p>
-                <a href="{{ route('vendor.products.create', 'digital') }}" class="a-v-panel-item-link">Add Digital Product</a>
-            </div>
-            
-            <div class="a-v-panel-item">
-                <h3 class="a-v-panel-item-title">Add Cargo Product</h3>
-                <p class="a-v-panel-item-description">You can add physical products that can be delivered by shipping.</p>
-                <a href="{{ route('vendor.products.create', 'cargo') }}" class="a-v-panel-item-link">Add Cargo Product</a>
-            </div>
-            
-            <div class="a-v-panel-item">
-                <h3 class="a-v-panel-item-title">Add Dead Drop Product</h3>
-                <p class="a-v-panel-item-description">You can add products that can be delivered via dead drop.</p>
-                <a href="{{ route('vendor.products.create', 'deaddrop') }}" class="a-v-panel-item-link">Add Dead Drop Product</a>
-            </div>
-            <div class="a-v-panel-item">
-                <h3 class="a-v-panel-item-title">Vendor Appearance</h3>
-                <p class="a-v-panel-item-description">You can customize your store appearance and profile.</p>
-                <a href="{{ route('vendor.appearance') }}" class="a-v-panel-item-link">Edit Appearance</a>
-            </div>
-            
-            <div class="a-v-panel-item">
-                <h3 class="a-v-panel-item-title">My Products</h3>
-                <p class="a-v-panel-item-description">You can view all products you have listed for sale on {{ config('app.name') }}.</p>
-                <a href="{{ route('vendor.my-products') }}" class="a-v-panel-item-link">View My Products</a>
-            </div>
-            
-            <div class="a-v-panel-item">
-                <h3 class="a-v-panel-item-title">My Sales</h3>
-                <p class="a-v-panel-item-description">You can view all your completed sales.</p>
-                <a href="{{ route('vendor.sales') }}" class="a-v-panel-item-link">View My Sales</a>
-            </div>
+@extends('layouts.vendor')
 
-            <div class="a-v-panel-item">
-                <h3 class="a-v-panel-item-title">My Disputes</h3>
-                <p class="a-v-panel-item-description">View and manage customer disputes and resolution cases.</p>
-                <a href="{{ route('vendor.disputes.index') }}" class="a-v-panel-item-link">View Disputes</a>
+@section('content')
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Vendor Dashboard</h1>
+                <p>Welcome to the Vendor Panel. Here you can manage your products in {{ config('app.name') }}.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Products</h5>
+                        <p class="card-text">{{ auth()->user()->products->count() }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Sales</h5>
+                        <p class="card-text">{{ \App\Models\Orders::where('vendor_id', auth()->id())->where('status', 'completed')->count() }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Disputes</h5>
+                        <p class="card-text">{{ \App\Models\Dispute::whereHas('order', function($query) { $query->where('vendor_id', auth()->id()); })->count() }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Latest Orders</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Buyer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(\App\Models\Orders::where('vendor_id', auth()->id())->latest()->take(5)->get() as $order)
+                                    <tr>
+                                        <td>{{ $order->id }}</td>
+                                        <td>{{ $order->buyer->username }}</td>
+                                        <td>{{ $order->total_amount }} XMR</td>
+                                        <td>{{ $order->status }}</td>
+                                        <td>{{ $order->created_at->diffForHumans() }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection

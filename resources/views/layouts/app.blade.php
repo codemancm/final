@@ -7,23 +7,15 @@
     <link rel="icon" type="image/png" href="{{ asset('images/omega.png') }}">
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
 </head>
-<body id="top" class="dark-mode">
-    @include('components.header')
+<body style="background-color: #f8f9fa;">
+    <div id="app">
+        @include('components.header')
 
-    
-        @auth
-            @include('components.leftbar')
-        @endauth
-        <main class="main-content">
-            @include('components.alerts')
+        <main class="py-4">
             @yield('content')
         </main>
+
+        @include('components.footer')
     </div>
-    
-    <!-- Footer include removed -->
-    
-    <a href="#top" class="scroll-button scroll-top" title="Scroll to top">▲</a>
-    <a href="#bottom" class="scroll-button scroll-bottom" title="Scroll to bottom">▼</a>
-    <div id="bottom"></div>
 </body>
 </html>
