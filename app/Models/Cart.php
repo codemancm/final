@@ -226,4 +226,17 @@ class Cart extends Model
                 return $item->getTotalPrice();
             });
     }
+
+    /**
+     * Get the total number of items in the user's cart.
+     *
+     * @return int
+     */
+    public static function getTotalItems()
+    {
+        if (auth()->check()) {
+            return self::where('user_id', auth()->id())->sum('quantity');
+        }
+        return 0;
+    }
 }
