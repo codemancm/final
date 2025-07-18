@@ -18,7 +18,7 @@
     <div class="header-right">
         <a href="{{ route('guides.index') }}" class="header-link">Guides</a>
         <a href="{{ route('rules') }}" class="header-link">Rules</a>
-        <a href="{{ route('references') }}" class="header-link">References</a>
+        <a href="{{ route('references.index') }}" class="header-link">References</a>
         @auth
             <a href="{{ route('cart.index') }}" class="header-link">Cart ({{ \App\Models\Cart::getTotalItems() }})</a>
             <a href="{{ route('wallet.index') }}" class="header-link">Wallet</a>
