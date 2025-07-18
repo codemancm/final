@@ -15,7 +15,7 @@
     @endauth
 </head>
 <body id="top" class="dark-mode @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->isVendor()) user-theme @endif">
-    @include('components.header')
+    @include('components/header')
 
     
         @auth
