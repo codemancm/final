@@ -227,6 +227,24 @@ Route::middleware(['auth', CheckBanned::class])->group(function () {
         Route::put('/admin/users/{user}/roles', [AdminController::class, 'updateUserRoles'])->name('admin.users.update-roles');
         Route::post('/admin/users/{user}/ban', [AdminController::class, 'banUser'])->name('admin.users.ban');
         Route::post('/admin/users/{user}/unban', [AdminController::class, 'unbanUser'])->name('admin.users.unban');
+
+        Route::get('/roles', [AdminController::class, 'roleList'])->name('admin.roles.list');
+        Route::get('/roles/{role}', [AdminController::class, 'roleDetails'])->name('admin.roles.details');
+        Route::post('/roles/{role}/permissions', [AdminController::class, 'updateRolePermissions'])->name('admin.roles.permissions.update');
+
+        Route::get('/admins', [AdminController::class, 'adminList'])->name('admin.admins.list');
+        Route::get('/admins/create', [AdminController::class, 'createAdmin'])->name('admin.admins.create');
+        Route::post('/admins', [AdminController::class, 'storeAdmin'])->name('admin.admins.store');
+        Route::get('/admins/{user}/edit', [AdminController::class, 'editAdmin'])->name('admin.admins.edit');
+        Route::put('/admins/{user}', [AdminController::class, 'updateAdmin'])->name('admin.admins.update');
+        Route::delete('/admins/{user}', [AdminController::class, 'destroyAdmin'])->name('admin.admins.destroy');
+
+        Route::get('/services', [AdminController::class, 'serviceList'])->name('admin.services.list');
+        Route::get('/services/create', [AdminController::class, 'createService'])->name('admin.services.create');
+        Route::post('/services', [AdminController::class, 'storeService'])->name('admin.services.store');
+        Route::get('/services/{service}/edit', [AdminController::class, 'editService'])->name('admin.services.edit');
+        Route::put('/services/{service}', [AdminController::class, 'updateService'])->name('admin.services.update');
+        Route::delete('/services/{service}', [AdminController::class, 'destroyService'])->name('admin.services.destroy');
         
         // Admin dispute management
         Route::get('/admin/disputes', [DisputesController::class, 'adminIndex'])->name('admin.disputes.index');
@@ -273,6 +291,10 @@ Route::middleware(['auth', CheckBanned::class])->group(function () {
         Route::post('/admin/products/{product}/feature', [AdminController::class, 'featureProduct'])->name('admin.products.feature');
         Route::post('/admin/products/{product}/unfeature', [AdminController::class, 'unfeatureProduct'])->name('admin.products.unfeature');
     });
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('services', ServiceController::class);
+});
 
     // -------------------------------------------------------------------------
     // Vendor Routes

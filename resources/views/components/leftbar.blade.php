@@ -15,8 +15,17 @@
                             class="sidebar-btn {{ request()->routeIs('admin.*') ? 'active' : '' }}">
                         🛠️ Admin-Panel
                     </button>
+                    <button onclick="window.location.href='{{ route('admin.roles.list') }}'"
+                            class="sidebar-btn {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                        📜 Roles
+                    </button>
+                    <button onclick="window.location.href='{{ route('admin.admins.list') }}'"
+                            class="sidebar-btn {{ request()->routeIs('admin.admins.*') ? 'active' : '' }}">
+                        👮 Admins
+                    </button>
                 @endif
                 <button class="sidebar-btn {{ request()->routeIs('products.*') ? 'active' : '' }}"onclick="window.location.href='{{ route('products.index') }}'">📦 Products</button>
+                <button class="sidebar-btn {{ request()->routeIs('services.*') ? 'active' : '' }}"onclick="window.location.href='{{ route('services.index') }}'">🛎️ Services</button>
                 <button class="sidebar-btn {{ request()->routeIs('vendors.*') ? 'active' : '' }}" onclick="window.location.href='{{ route('vendors.index') }}'" >👥 Vendors</button>
                 <button class="sidebar-btn {{ request()->routeIs('orders.*') ? 'active' : '' }}" onclick="window.location.href='{{ route('orders.index') }}'">🧳 Order</button>
                 <button class="sidebar-btn {{ request()->routeIs('become.*') ? 'active' : '' }}" onclick="window.location.href='{{ route('become.vendor') }}'">🏪 Be a Vendor</button>

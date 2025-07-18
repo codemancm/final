@@ -22,4 +22,14 @@ class Role extends Model
     {
         return $this->belongsToMany(User::class);
     }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+
+    public function hasPermissionTo($permission)
+    {
+        return $this->permissions()->where('name', $permission)->exists();
+    }
 }

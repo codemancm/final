@@ -267,6 +267,107 @@ class AdminController extends Controller
             ->with('success', 'User unbanned successfully.');
     }
 
+    public function roleList()
+    {
+        $roles = Role::with('permissions')->get();
+        return view('admin.roles.list', compact('roles'));
+    }
+
+    public function roleDetails(Role $role)
+    {
+        $permissions = Permission::all();
+        return view('admin.roles.details', compact('role', 'permissions'));
+    }
+
+    public function updateRolePermissions(Request $request, Role $role)
+    {
+        if ($role->name === 'super_admin') {
+            return redirect()->route('admin.roles.details', $role)
+                ->with('error', 'The super admin role cannot be modified.');
+        }
+
+        $request->validate([
+            'permissions' => 'array',
+            'permissions.*' => 'exists:permissions,id',
+        ]);
+
+        $role->permissions()->sync($request->input('permissions', []));
+
+        return redirect()->route('admin.roles.details', $role)
+            ->with('success', 'Role permissions updated successfully.');
+    }
+
+    public function adminList()
+    {
+        $admins = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })->get();
+
+        return view('admin.admins.list', compact('admins'));
+    }
+
+    public function createAdmin()
+    {
+        $roles = Role::where('name', 'like', 'admin%')->get();
+        return view('admin.admins.create', compact('roles'));
+    }
+
+    public function storeAdmin(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'roles' => 'required|array',
+            'roles.*' => 'exists:roles,id',
+        ]);
+
+        $user = new User([
+            'username' => $request->username,
+            'password' => bcrypt($request->password),
+        ]);
+        $user->save();
+
+        $user->roles()->sync($request->input('roles', []));
+
+        return redirect()->route('admin.admins.list')->with('success', 'Admin created successfully.');
+    }
+
+    public function editAdmin(User $user)
+    {
+        $roles = Role::where('name', 'like', 'admin%')->get();
+        return view('admin.admins.edit', compact('user', 'roles'));
+    }
+
+    public function updateAdmin(Request $request, User $user)
+    {
+        $request->validate([
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'roles' => 'required|array',
+            'roles.*' => 'exists:roles,id',
+        ]);
+
+        $user->username = $request->username;
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+        $user->save();
+
+        $user->roles()->sync($request->input('roles', []));
+
+        return redirect()->route('admin.admins.list')->with('success', 'Admin updated successfully.');
+    }
+
+    public function destroyAdmin(User $user)
+    {
+        if ($user->hasRole('super_admin')) {
+            return redirect()->route('admin.admins.list')->with('error', 'The super admin cannot be deleted.');
+        }
+
+        $user->delete();
+        return redirect()->route('admin.admins.list')->with('success', 'Admin deleted successfully.');
+    }
+
     public function supportRequests()
     {
         $requests = SupportRequest::mainRequests()
