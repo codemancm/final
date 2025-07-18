@@ -11,7 +11,21 @@ class WalletController extends Controller
 {
     public function index()
     {
+<<<<<<< HEAD
         $wallet = Auth::user()->wallet;
+=======
+        $user = Auth::user();
+        $wallet = $user->wallet;
+
+        if (is_null($wallet)) {
+            // If the user does not have a wallet, create one
+            $wallet = new Wallet();
+            $user->wallet()->save($wallet);
+            // Refresh the wallet variable
+            $wallet = $user->fresh()->wallet;
+        }
+
+>>>>>>> 02ed0f34453d7b9732f9c64c17e03b526f5a3d9a
         $transactions = Transaction::where('user_id', Auth::id())->latest()->paginate(15);
         return view('wallet.index', compact('wallet', 'transactions'));
     }

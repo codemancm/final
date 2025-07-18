@@ -1,12 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
-
-<div class="a-v-panel-container">
+<div class="a-v-panel-container admin-dashboard">
     <div class="a-v-panel-card">
-        <h1 class="a-v-panel-title">Admin Panel</h1>
+        <h1 class="a-v-panel-title">Admin Dashboard</h1>
         <p class="a-v-panel-welcome">Welcome to the Admin Panel. Here you can manage various aspects of {{ config('app.name') }}.</p>
-        
+
+        <div class="statistics-section">
+            <h2 class="statistics-title">Platform Statistics</h2>
+            <div class="statistics-grid">
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Total Users</div>
+                    <div class="statistic-card-value">{{ $totalUsers }}</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Total Products</div>
+                    <div class="statistic-card-value">{{ $totalProducts }}</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Banned Users</div>
+                    <div class="statistic-card-value">{{ $bannedUsersCount }}</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">PGP Keys</div>
+                    <div class="statistic-card-value">{{ $totalPgpKeys }}</div>
+                </div>
+            </div>
+        </div>
+
         <div class="a-v-panel-grid">
             <div class="a-v-panel-item">
                 <h3 class="a-v-panel-item-title">User Management</h3>
@@ -76,4 +97,8 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.body.classList.add('admin-dashboard');
+</script>
 @endsection
