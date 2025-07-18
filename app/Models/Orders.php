@@ -20,6 +20,7 @@ class Orders extends Model
     public const STATUS_COMPLETED = 'completed';
     public const STATUS_CANCELLED = 'cancelled';
     public const STATUS_DISPUTED = 'disputed';
+    public const STATUS_IN_ESCROW = 'in_escrow';
 
     /**
      * The attributes that are mass assignable.

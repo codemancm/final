@@ -22,6 +22,8 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\DisputesController;
+use App\Http\Controllers\WalletController;
+use App\Http\Controllers\Admin\EscrowController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -187,12 +189,23 @@ Route::middleware(['auth', CheckBanned::class])->group(function () {
     Route::get('/disputes/{id}', [DisputesController::class, 'show'])->name('disputes.show');
     Route::post('/disputes/{uniqueUrl}', [DisputesController::class, 'store'])->name('disputes.store');
     Route::post('/disputes/{id}/message', [DisputesController::class, 'addMessage'])->name('disputes.add-message');
+
+    // Wallet routes
+    Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+    Route::post('/wallet/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
+    Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
+    Route::get('/wallet/generate-address', [WalletController::class, 'generateAddress'])->name('wallet.generate-address');
     
 
     // -------------------------------------------------------------------------
     // Admin Routes
     // -------------------------------------------------------------------------
     Route::middleware(AdminMiddleware::class)->group(function () {
+        Route::get('/admin/escrow', [EscrowController::class, 'index'])->name('admin.escrow.index');
+        Route::get('/admin/escrow/{order}', [EscrowController::class, 'show'])->name('admin.escrow.show');
+        Route::post('/admin/escrow/{order}/release', [EscrowController::class, 'release'])->name('admin.escrow.release');
+        Route::post('/admin/escrow/{order}/refund', [EscrowController::class, 'refund'])->name('admin.escrow.refund');
+
         Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
         Route::get('/admin/canary', [AdminController::class, 'showUpdateCanary'])->name('admin.canary');
         Route::post('/admin/canary', [AdminController::class, 'updateCanary'])->name('admin.canary.post');
