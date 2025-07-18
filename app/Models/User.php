@@ -202,6 +202,16 @@ class User extends Authenticatable
         return $this->roles()->where('name', $role)->exists();
     }
 
+    public function hasPermissionTo($permission): bool
+    {
+        foreach ($this->roles as $role) {
+            if ($role->hasPermissionTo($permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Check if the user is an admin.
      *

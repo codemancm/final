@@ -323,6 +323,10 @@ class VendorController extends Controller
      */
     public function store(Request $request, string $type)
     {
+        if (!auth()->user()->hasPermissionTo('manage_products') && !auth()->user()->isVendor()) {
+            abort(403, 'Unauthorized action.');
+        }
+
         if (!in_array($type, [Product::TYPE_CARGO, Product::TYPE_DIGITAL, Product::TYPE_DEADDROP])) {
             abort(404);
         }
