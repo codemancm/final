@@ -1,9 +1,29 @@
 @extends('layouts.app')
+
 @section('content')
-<div class="a-v-panel-container">
+<div class="a-v-panel-container vendor-dashboard">
     <div class="a-v-panel-card">
-        <h1 class="a-v-panel-title">Vendor Panel</h1>
-        <p class="a-v-panel-welcome">Welcome to the Vendor Panel. Here you can manage your products in {{ config('app.name') }}.</p>     
+        <h1 class="a-v-panel-title">Vendor Dashboard</h1>
+        <p class="a-v-panel-welcome">Welcome to the Vendor Panel. Here you can manage your products in {{ config('app.name') }}.</p>
+
+        <div class="statistics-section">
+            <h2 class="statistics-title">Your Statistics</h2>
+            <div class="statistics-grid">
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Total Products</div>
+                    <div class="statistic-card-value">{{ $totalProducts }}</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Total Sales</div>
+                    <div class="statistic-card-value">{{ $totalSales }}</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Total Disputes</div>
+                    <div class="statistic-card-value">{{ $totalDisputes }}</div>
+                </div>
+            </div>
+        </div>
+
         <div class="a-v-panel-grid">
             <div class="a-v-panel-item">
                 <h3 class="a-v-panel-item-title">Add Digital Product</h3>
@@ -48,4 +68,8 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.body.classList.add('vendor-dashboard');
+</script>
 @endsection

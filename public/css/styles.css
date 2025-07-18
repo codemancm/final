@@ -595,6 +595,127 @@ background-color:#96c;
 transform:translateY(-2px)
 }
 
+/* General User Theme */
+body.user-theme {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.user-theme .main-content {
+    background-color: #ffffff;
+}
+
+.user-theme .a-v-panel-card,
+.user-theme .home-welcome-message,
+.user-theme .home-highlight-container,
+.user-theme .home-highlight-card,
+.user-theme .product-card,
+.user-theme .cart-index-main-card,
+.user-theme .cart-checkout-card,
+.user-theme .orders-index-card,
+.user-theme .orders-show-main,
+.user-theme .vendors-index-card,
+.user-theme .vendors-show-main-card,
+.user-theme .wishlist-index-card,
+.user-theme .settings-card,
+.user-theme .profile-card,
+.user-theme .support-index-card,
+.user-theme .support-create-card,
+.user-theme .support-show-card,
+.user-theme .messages-index-card,
+.user-theme .messages-create-card,
+.user-theme .messages-show-card,
+.user-theme .disputes-index-card,
+.user-theme .disputes-show-card,
+.user-theme .rules-section,
+.user-theme .guides-index-card,
+.user-theme .guides-general-card,
+.user-theme .references-index-card,
+.user-theme .return-addresses-card,
+.user-theme .become-vendor-index-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.user-theme .a-v-panel-title,
+.user-theme .home-title,
+.user-theme .home-highlight-heading,
+.user-theme .product-card-name,
+.user-theme .cart-index-title,
+.user-theme .cart-checkout-title,
+.user-theme .orders-index-title,
+.user-theme .orders-show-title,
+.user-theme .vendors-index-title,
+.user-theme .vendors-show-header h1,
+.user-theme .wishlist-index-title,
+.user-theme .settings-card-title,
+.user-theme .profile-form-title,
+.user-theme .support-index-badge,
+.user-theme .support-create-title,
+.user-theme .support-show-title,
+.user-theme .messages-index-new-btn,
+.user-theme .messages-create-title,
+.user-theme .disputes-index-title,
+.user-theme .disputes-show-title,
+.user-theme .rules-title,
+.user-theme .guides-index-title,
+.user-theme .guides-general-title,
+.user-theme .references-index-card h2,
+.user-theme .return-addresses-card h2,
+.user-theme .become-vendor-index-title {
+    color: #000000;
+}
+
+.user-theme .home-highlight-card:hover {
+    border-color: #fdd835;
+}
+
+.user-theme .home-highlight-button,
+.user-theme .product-card-wishlist-button.active,
+.user-theme .cart-index-checkout-btn,
+.user-theme .orders-index-action-btn,
+.user-theme .vendors-index-item:hover .vendors-index-username,
+.user-theme .wishlist-index-browse-btn,
+.user-theme .settings-button,
+.user-theme .profile-submit-btn,
+.user-theme .support-index-new-btn,
+.user-theme .support-create-submit,
+.user-theme .support-show-submit-btn,
+.user-theme .messages-create-submit,
+.user-theme .messages-show-submit,
+.user-theme .disputes-index-action-btn,
+.user-theme .disputes-show-submit-btn,
+.user-theme .rules-note strong,
+.user-theme .guides-general-highlight,
+.user-theme .references-index-button,
+.user-theme .return-addresses-submit-btn,
+.user-theme .become-vendor-index-btn {
+    background-color: #fdd835;
+    color: #000000;
+}
+
+.user-theme .home-highlight-button:hover,
+.user-theme .product-card-wishlist-button.active:hover,
+.user-theme .cart-index-checkout-btn:hover,
+.user-theme .orders-index-action-btn:hover,
+.user-theme .vendors-index-item:hover .vendors-index-username:hover,
+.user-theme .wishlist-index-browse-btn:hover,
+.user-theme .settings-button:hover,
+.user-theme .profile-submit-btn:hover,
+.user-theme .support-index-new-btn:hover,
+.user-theme .support-create-submit:hover,
+.user-theme .support-show-submit-btn:hover,
+.user-theme .messages-create-submit:hover,
+.user-theme .messages-show-submit:hover,
+.user-theme .disputes-index-action-btn:hover,
+.user-theme .disputes-show-submit-btn:hover,
+.user-theme .references-index-button:hover,
+.user-theme .return-addresses-submit-btn:hover,
+.user-theme .become-vendor-index-btn:hover {
+    background-color: #fbc02d;
+}
+
 .text-warning {
 color:#ffc107
 }

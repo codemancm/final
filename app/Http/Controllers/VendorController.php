@@ -62,7 +62,12 @@ class VendorController extends Controller
      */
     public function index()
     {
-        return view('vendor.index');
+        $user = Auth::user();
+        $totalProducts = Product::where('user_id', $user->id)->count();
+        $totalSales = Orders::where('vendor_id', $user->id)->count();
+        $totalDisputes = $user->vendorDisputes()->count();
+
+        return view('vendor.index', compact('totalProducts', 'totalSales', 'totalDisputes'));
     }
 
     /**

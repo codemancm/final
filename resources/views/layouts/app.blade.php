@@ -6,8 +6,15 @@
     <title>@yield('title', config('app.name'))</title>
     <link rel="icon" type="image/png" href="{{ asset('images/omega.png') }}">
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
+    @auth
+        @if(auth()->user()->isAdmin())
+            <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
+        @elseif(auth()->user()->isVendor())
+            <link href="{{ asset('css/vendor.css') }}" rel="stylesheet">
+        @endif
+    @endauth
 </head>
-<body id="top" class="dark-mode">
+<body id="top" class="dark-mode @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->isVendor()) user-theme @endif">
     @include('components.header')
 
     
