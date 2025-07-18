@@ -197,36 +197,56 @@ class OrdersController extends Controller
         try {
             $user = Auth::user();
             $cartItems = Cart::where('user_id', $user->id)->with(['product', 'product.user'])->get();
-            
+
             if ($cartItems->isEmpty()) {
                 return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
             }
-            
+
             // Get vendor ID from cart items
             $vendorId = $cartItems->first()->product->user_id;
-            
+
             // Check if user can create a new order with this vendor (spam prevention)
             [$canCreate, $reason] = Orders::canCreateNewOrder($user->id, $vendorId);
-            
+
             if (!$canCreate) {
                 return redirect()->route('cart.checkout')->with('error', $reason);
             }
-            
+
             // Calculate order totals
             $subtotal = Cart::getCartTotal($user);
             $commissionPercentage = config('marketplace.commission_percentage');
             $commission = ($subtotal * $commissionPercentage) / 100;
             $total = $subtotal + $commission;
-            
+
+            // Check if the user has enough balance
+            $wallet = $user->wallet;
+            if ($wallet->balance < $total) {
+                return redirect()->route('cart.checkout')->with('error', 'You do not have enough balance to make this purchase.');
+            }
+
             // Create the order
             $order = Orders::createFromCart($user, $cartItems, $subtotal, $commission, $total);
-            
+            $order->status = Orders::STATUS_IN_ESCROW;
+            $order->save();
+
+            // Deduct the amount from the user's wallet
+            $wallet->balance -= $total;
+            $wallet->save();
+
+            // Create a transaction record
+            Transaction::create([
+                'user_id' => $user->id,
+                'type' => 'purchase',
+                'amount' => -$total,
+                'description' => 'Purchase of order #' . $order->id,
+            ]);
+
             // Clear the cart
             Cart::where('user_id', $user->id)->delete();
-            
+
             return redirect()->route('orders.show', $order->unique_url)
-                ->with('success', 'Order created successfully. Please complete the payment.');
-                
+                ->with('success', 'Order created successfully. The funds are now in escrow.');
+
         } catch (\Exception $e) {
             Log::error('Failed to create order: ' . $e->getMessage());
             return redirect()->route('cart.checkout')

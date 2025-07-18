@@ -9,9 +9,16 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
+
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(Wallet::class);
+    }
 
     public $incrementing = false;
     protected $keyType = 'string';

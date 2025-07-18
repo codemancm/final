@@ -68,7 +68,12 @@
             <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">🏠 Home</a>
             <a href="{{ route('messages.index') }}" class="nav-link {{ request()->routeIs('messages.*') ? 'active' : '' }}" >💬 Messages</a>
             <a href="{{ route('wishlist.index') }}" class="nav-link {{ request()->routeIs('wishlist.*') ? 'active' : '' }}" >❤️ Wishlist</a>
-            <a href="#" class="nav-link" onclick="showSection('wallet')">💰 Wallet</a>
+            <a href="{{ route('wallet.index') }}" class="nav-link {{ request()->routeIs('wallet.*') ? 'active' : '' }}">💰 Wallet</a>
+            @auth
+                <span class="navbar-text">
+                    Balance: {{ Auth::user()->wallet ? Auth::user()->wallet->balance : '0' }} XMR
+                </span>
+            @endauth
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">👤 Account</a>
             <a href="{{ route('support.index') }}" class="nav-link {{ request()->routeIs('support.*') ? 'active' : '' }}">🎧 Support</a>
         </div>

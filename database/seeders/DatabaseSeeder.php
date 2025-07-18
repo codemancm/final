@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             UserSeeder::class,    // Must run first to create vendors
+            WalletSeeder::class, // Must run after UserSeeder
             ProductSeeder::class, // Depends on vendors existing
             ReviewSeeder::class,  // Depends on both users and products existing
         ]);
