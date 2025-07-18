@@ -1,7 +1,6 @@
 <header class="header">
     <div class="header-left">
         <a href="{{ route('home') }}" class="logo-link">
-            <img src="{{ asset('images/omega.png') }}" alt="Logo" class="logo-img">
             <span class="logo-text">{{ config('app.name') }}</span>
         </a>
         <form action="{{ route('products.index') }}" method="GET" class="search-form">
