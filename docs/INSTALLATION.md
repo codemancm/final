@@ -217,7 +217,10 @@ If you want to create some test users and products to play around with, you can 
 php artisan db:seed
 ```
 
-Finally, we need to set proper file permissions for security. Run these commands in sequence:
+
+
+
+Finally,         we need to set proper file permissions for security. Run these commands in sequence:
 ```bash
 sudo chown -R www-data:www-data /var/www/omega
 sudo find /var/www/omega -type f -exec chmod 644 {} \;

@@ -13,10 +13,19 @@ return new class extends Migration
     {
         Schema::create('admin_audit_log', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
+
+            // Match users.id which is char(36)
+            $table->char('admin_id', 36);
+            
             $table->string('action');
             $table->text('details')->nullable();
             $table->timestamps();
+
+            // Foreign key to users.id (UUID-style)
+            $table->foreign('admin_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
         });
     }
 
@@ -28,3 +37,4 @@ return new class extends Migration
         Schema::dropIfExists('admin_audit_log');
     }
 };
+
