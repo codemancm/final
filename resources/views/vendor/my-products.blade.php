@@ -44,6 +44,12 @@
                                     Delete
                                 </button>
                             </form>
+                            <form action="{{ route('vendor.products.clone', $product) }}" method="POST" style="display: inline;">
+                                @csrf
+                                <button type="submit" class="my-products-index-btn my-products-index-btn-clone">
+                                    Clone
+                                </button>
+                            </form>
                         </div>
                     </div>
                 @endforeach

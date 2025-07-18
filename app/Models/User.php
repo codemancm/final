@@ -342,4 +342,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(SecretPhrase::class);
     }
+
+    public function unreadMessagesCount()
+    {
+        return $this->conversations()
+            ->whereHas('messages', function ($query) {
+                $query->where('sender_id', '!=', $this->id)
+                    ->where('is_read', false);
+            })
+            ->count();
+    }
 }

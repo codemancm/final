@@ -21,6 +21,26 @@
                     <div class="statistic-card-title">Total Disputes</div>
                     <div class="statistic-card-value">{{ $totalDisputes }}</div>
                 </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Total Earnings</div>
+                    <div class="statistic-card-value">{{ number_format($totalEarnings, 5) }} XMR</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Escrowed Balance</div>
+                    <div class="statistic-card-value">{{ number_format($escrowedBalance, 5) }} XMR</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Positive Reviews</div>
+                    <div class="statistic-card-value">{{ $ratingsSummary['positive'] }}</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Mixed Reviews</div>
+                    <div class="statistic-card-value">{{ $ratingsSummary['mixed'] }}</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Negative Reviews</div>
+                    <div class="statistic-card-value">{{ $ratingsSummary['negative'] }}</div>
+                </div>
             </div>
         </div>
 

@@ -24,11 +24,13 @@ use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\Encoders\GifEncoder;
+use App\Helpers\AdminActionLog;
 use Intervention\Image\Exceptions\NotReadableException;
+use App\Services\DashboardStatsService;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function index(DashboardStatsService $statsService)
     {
         // User Statistics
         $totalUsers = User::count();
@@ -52,6 +54,15 @@ class AdminController extends Controller
         $pgpVerificationRate = $totalUsers > 0 ? ($verifiedPgpKeys / $totalUsers) * 100 : 0;
         $twoFaAdoptionRate = $totalUsers > 0 ? ($twoFaEnabled / $totalUsers) * 100 : 0;
 
+        // Get dashboard stats from the service
+        $dashboardStats = $statsService->getStats();
+
+        // System Health (placeholders)
+        $systemHealth = [
+            'server_load' => 'N/A',
+            'tor_mirrors' => 'N/A',
+        ];
+
         return view('admin.index', compact(
             'totalUsers',
             'usersByRole',
@@ -62,7 +73,9 @@ class AdminController extends Controller
             'pgpVerificationRate',
             'twoFaAdoptionRate',
             'totalProducts',
-            'productsByType'
+            'productsByType',
+            'dashboardStats',
+            'systemHealth'
         ));
     }
 
@@ -80,6 +93,8 @@ class AdminController extends Controller
             ]);
 
             Storage::put('public/canary.txt', $request->canary);
+
+            AdminActionLog::log('updated canary');
 
             return redirect()->route('admin.canary')->with('success', 'Canary updated successfully.');
         } catch (ValidationException $e) {
@@ -143,6 +158,7 @@ class AdminController extends Controller
 
     public function deleteLogs($type)
     {
+        AdminActionLog::log('deleted logs', ['type' => $type]);
         $logPath = storage_path('logs/laravel.log');
         
         if (File::exists($logPath)) {
@@ -172,6 +188,7 @@ class AdminController extends Controller
     {
         $selectedLogs = $request->input('selected_logs', []);
         
+        AdminActionLog::log('deleted selected logs', ['type' => $type, 'count' => count($selectedLogs)]);
         if (empty($selectedLogs)) {
             return redirect()->route('admin.logs.show', $type)
                 ->with('error', 'No logs selected for deletion.');
@@ -211,7 +228,7 @@ class AdminController extends Controller
 
     public function userDetails(User $user)
     {
-        $user->load('referrer');
+        $user->load('referrer', 'vendorProfile');
         return view('admin.users.details', compact('user'));
     }
 
@@ -227,6 +244,8 @@ class AdminController extends Controller
         // Sync the user's roles
         $roleIds = Role::whereIn('name', $roles)->pluck('id');
         $user->roles()->sync($roleIds);
+
+        AdminActionLog::log('updated user roles', ['user_id' => $user->id, 'roles' => $roles]);
 
         return redirect()->route('admin.users.details', $user)
             ->with('success', 'User roles updated successfully.');
@@ -249,6 +268,8 @@ class AdminController extends Controller
             ]
         );
 
+        AdminActionLog::log('banned user', ['user_id' => $user->id, 'reason' => $request->reason, 'duration' => $request->duration]);
+
         // Log the ban action
         Log::info("User banned: ID {$user->id} banned until {$bannedUntil} for reason: {$request->reason}");
 
@@ -259,6 +280,8 @@ class AdminController extends Controller
     public function unbanUser(User $user)
     {
         $user->bannedUser()->delete();
+
+        AdminActionLog::log('unbanned user', ['user_id' => $user->id]);
 
         // Log the unban action
         Log::info("User unbanned: ID {$user->id}");
@@ -281,6 +304,7 @@ class AdminController extends Controller
 
     public function updateRolePermissions(Request $request, Role $role)
     {
+        AdminActionLog::log('updated role permissions', ['role_id' => $role->id, 'permissions' => $request->input('permissions', [])]);
         if ($role->name === 'super_admin') {
             return redirect()->route('admin.roles.details', $role)
                 ->with('error', 'The super admin role cannot be modified.');
@@ -314,6 +338,7 @@ class AdminController extends Controller
 
     public function storeAdmin(Request $request)
     {
+        AdminActionLog::log('created admin', ['username' => $request->username]);
         $request->validate([
             'username' => 'required|string|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
@@ -340,6 +365,7 @@ class AdminController extends Controller
 
     public function updateAdmin(Request $request, User $user)
     {
+        AdminActionLog::log('updated admin', ['user_id' => $user->id]);
         $request->validate([
             'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
@@ -360,6 +386,7 @@ class AdminController extends Controller
 
     public function destroyAdmin(User $user)
     {
+        AdminActionLog::log('deleted admin', ['user_id' => $user->id]);
         if ($user->hasRole('super_admin')) {
             return redirect()->route('admin.admins.list')->with('error', 'The super admin cannot be deleted.');
         }
@@ -393,6 +420,7 @@ class AdminController extends Controller
 
     public function replySupportRequest(Request $request, SupportRequest $supportRequest)
     {
+        AdminActionLog::log('replied to support request', ['support_request_id' => $supportRequest->id]);
         // Ensure we're replying to a main request
         if (!$supportRequest->isMainRequest()) {
             return redirect()->route('admin.support.requests')
@@ -443,6 +471,7 @@ class AdminController extends Controller
 
     public function updateSupportStatus(Request $request, SupportRequest $supportRequest)
     {
+        AdminActionLog::log('updated support request status', ['support_request_id' => $supportRequest->id, 'status' => $request->status]);
         // Ensure we're updating a main request
         if (!$supportRequest->isMainRequest()) {
             return redirect()->route('admin.support.requests')
@@ -481,6 +510,7 @@ class AdminController extends Controller
     public function sendBulkMessage(Request $request)
     {
         try {
+            AdminActionLog::log('sent bulk message', ['title' => $request->title, 'target_role' => $request->target_role]);
             $request->validate([
                 'title' => 'required|string|min:3|max:255',
                 'message' => 'required|string|min:10|max:5000',
@@ -559,6 +589,7 @@ class AdminController extends Controller
     public function deleteBulkMessage(Notification $notification)
     {
         try {
+            AdminActionLog::log('deleted bulk message', ['notification_id' => $notification->id]);
             $notification->delete();
             return redirect()->route('admin.bulk-message.list')
                 ->with('success', 'Bulk message deleted successfully.');
@@ -592,6 +623,7 @@ class AdminController extends Controller
     public function popupStore(Request $request)
     {
         try {
+            AdminActionLog::log('created popup', ['title' => $request->title]);
             $request->validate([
                 'title' => 'required|string|max:255',
                 'message' => 'required|string|max:5000',
@@ -627,6 +659,7 @@ class AdminController extends Controller
     public function popupActivate(Popup $popup)
     {
         try {
+            AdminActionLog::log('activated popup', ['popup_id' => $popup->id]);
             $popup->update(['active' => true]);
             Log::info("Pop-up {$popup->id} activated by admin " . auth()->id());
 
@@ -645,6 +678,7 @@ class AdminController extends Controller
     public function popupDestroy(Popup $popup)
     {
         try {
+            AdminActionLog::log('deleted popup', ['popup_id' => $popup->id]);
             $popup->delete();
             Log::info("Pop-up deleted by admin: {$popup->id}");
 
@@ -674,6 +708,7 @@ class AdminController extends Controller
                 'parent_id' => $request->parent_id
             ]);
 
+            AdminActionLog::log('created category', ['name' => $request->name]);
             Log::info("Category created: {$category->getFormattedName()} by admin {$request->user()->id}");
 
             return redirect()->route('admin.categories')
@@ -696,6 +731,7 @@ class AdminController extends Controller
         try {
             $categoryName = $category->getFormattedName();
             
+            AdminActionLog::log('deleted category', ['name' => $categoryName]);
             // Begin transaction to ensure all operations complete successfully
             \DB::beginTransaction();
             
@@ -858,6 +894,7 @@ class AdminController extends Controller
     public function destroyProduct(Product $product)
     {
         try {
+            AdminActionLog::log('deleted product', ['product_id' => $product->id]);
             $product->delete();
             
             // Log the deletion
@@ -881,6 +918,7 @@ class AdminController extends Controller
     public function featureProduct(Product $product)
     {
         try {
+            AdminActionLog::log('featured product', ['product_id' => $product->id]);
             // Check if product is already featured
             if ($product->isFeatured()) {
                 return redirect()->route('admin.all-products')
@@ -914,6 +952,7 @@ class AdminController extends Controller
     public function unfeatureProduct(Product $product)
     {
         try {
+            AdminActionLog::log('unfeatured product', ['product_id' => $product->id]);
             // Delete the featured product record
             $featured = $product->featuredProduct;
             
@@ -972,6 +1011,7 @@ class AdminController extends Controller
     public function updateProduct(Request $request, Product $product)
     {
         try {
+            AdminActionLog::log('updated product', ['product_id' => $product->id]);
             // Validate the request
             try {
                 $validated = $request->validate([
@@ -1206,6 +1246,7 @@ class AdminController extends Controller
 
     public function acceptVendorApplication(VendorPayment $application)
     {
+        AdminActionLog::log('accepted vendor application', ['user_id' => $application->user_id]);
         if ($application->application_status !== 'waiting') {
             return redirect()->route('admin.vendor-applications.show', $application)
                 ->with('error', 'This application has already been processed.');
@@ -1241,6 +1282,7 @@ class AdminController extends Controller
 
     public function denyVendorApplication(VendorPayment $application)
     {
+        AdminActionLog::log('denied vendor application', ['user_id' => $application->user_id]);
         if ($application->application_status !== 'waiting') {
             return redirect()->route('admin.vendor-applications.show', $application)
                 ->with('error', 'This application has already been processed.');
@@ -1425,5 +1467,52 @@ class AdminController extends Controller
             Log::error('Product picture upload failed: ' . $e->getMessage());
             throw new Exception($e->getMessage());
         }
+    }
+
+    public function vendorEscrowBalances()
+    {
+        $vendors = User::whereHas('roles', function ($query) {
+            $query->where('name', 'vendor');
+        })->with(['vendorProfile', 'sales' => function ($query) {
+            $query->where('status', 'in_escrow');
+        }])->get();
+
+        return view('admin.vendor-escrow', compact('vendors'));
+    }
+
+    public function reportedProducts()
+    {
+        $products = Product::where('reported', true)->with('user')->paginate(32);
+
+        return view('admin.reported-products', compact('products'));
+    }
+
+    public function auditLog()
+    {
+        $logs = \App\Models\AdminAuditLog::with('admin')->latest()->paginate(50);
+
+        return view('admin.audit-log', compact('logs'));
+    }
+
+    public function showPgpKeyRotation()
+    {
+        return view('admin.pgp-key-rotation');
+    }
+
+    public function rotatePgpKey(Request $request)
+    {
+        $request->validate([
+            'public_key' => 'required|string',
+        ]);
+
+        $user = auth()->user();
+        $pgpKey = $user->pgpKey ?? new \App\Models\PgpKey();
+        $pgpKey->user_id = $user->id;
+        $pgpKey->public_key = $request->public_key;
+        $pgpKey->save();
+
+        AdminActionLog::log('rotated PGP key');
+
+        return redirect()->route('admin.pgp-key-rotation')->with('success', 'PGP key rotated successfully.');
     }
 }

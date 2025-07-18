@@ -13,6 +13,8 @@ class HomeController extends Controller
      */
     public function index(XmrPriceController $xmrPriceController)
     {
+        $user = Auth::user();
+
         // Get active popup (always show if available)
         $popup = \App\Models\Popup::getActive();
         
@@ -87,12 +89,24 @@ class HomeController extends Controller
                 'delivery_options' => $formattedDeliveryOptions
             ];
         }
+
+        $currentOrders = \App\Models\Orders::where('user_id', $user->id)
+            ->whereIn('status', ['payment_received', 'product_sent'])
+            ->count();
+
+        $walletBalance = $user->wallet->balance;
+        $activeDisputes = $user->disputes()->where('status', 'open')->count();
+        $newMessages = $user->unreadMessagesCount();
         
         return view('home', [
-            'username' => Auth::user()->username,
+            'username' => $user->username,
             'popup' => $popup,
             'adSlots' => $adSlots,
-            'featuredProducts' => $formattedFeaturedProducts
+            'featuredProducts' => $formattedFeaturedProducts,
+            'currentOrders' => $currentOrders,
+            'walletBalance' => $walletBalance,
+            'activeDisputes' => $activeDisputes,
+            'newMessages' => $newMessages,
         ]);
     }
 }

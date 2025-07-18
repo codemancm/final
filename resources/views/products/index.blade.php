@@ -51,14 +51,42 @@
                         </div>
 
                         <div class="products-index-form-group">
-                            <label for="sort_price" class="products-index-label">Sort by Price</label>
-                            <select name="sort_price" 
-                                    id="sort_price" 
+                            <label for="sort_by" class="products-index-label">Sort by</label>
+                            <select name="sort_by"
+                                    id="sort_by"
                                     class="products-index-select">
-                                <option value="">Most Recent</option>
-                                <option value="asc" {{ ($filters['sort_price'] ?? '') === 'asc' ? 'selected' : '' }}>Price: Low to High</option>
-                                <option value="desc" {{ ($filters['sort_price'] ?? '') === 'desc' ? 'selected' : '' }}>Price: High to Low</option>
+                                <option value="">Random</option>
+                                <option value="price_asc" {{ ($filters['sort_by'] ?? '') === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+                                <option value="price_desc" {{ ($filters['sort_by'] ?? '') === 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+                                <option value="rating" {{ ($filters['sort_by'] ?? '') === 'rating' ? 'selected' : '' }}>Rating</option>
+                                <option value="newest" {{ ($filters['sort_by'] ?? '') === 'newest' ? 'selected' : '' }}>Newest</option>
+                                <option value="popular" {{ ($filters['sort_by'] ?? '') === 'popular' ? 'selected' : '' }}>Popular</option>
                             </select>
+                        </div>
+                        <div class="products-index-form-group">
+                            <label for="ships_to" class="products-index-label">Ships to</label>
+                            <input type="text"
+                                   name="ships_to"
+                                   id="ships_to"
+                                   value="{{ $filters['ships_to'] ?? '' }}"
+                                   placeholder="Enter country"
+                                   class="products-index-input">
+                        </div>
+                        <div class="products-index-form-group">
+                            <label for="price_min" class="products-index-label">Min Price (XMR)</label>
+                            <input type="number"
+                                   name="price_min"
+                                   id="price_min"
+                                   value="{{ $filters['price_min'] ?? '' }}"
+                                   class="products-index-input">
+                        </div>
+                        <div class="products-index-form-group">
+                            <label for="price_max" class="products-index-label">Max Price (XMR)</label>
+                            <input type="number"
+                                   name="price_max"
+                                   id="price_max"
+                                   value="{{ $filters['price_max'] ?? '' }}"
+                                   class="products-index-input">
                         </div>
                     </div>
                 </div>

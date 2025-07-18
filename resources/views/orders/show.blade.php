@@ -95,6 +95,16 @@
                                 ({{ $order->getAutoCompleteDeadline()->diffForHumans() }})</p>
                             @endif
                         </div>
+                        <div class="orders-show-actions">
+                            <form action="{{ route('disputes.store', $order->unique_url) }}" method="POST" class="orders-show-action-form">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="reason">Reason for dispute</label>
+                                    <textarea name="reason" id="reason" class="form-control" rows="3"></textarea>
+                                </div>
+                                <button type="submit" class="orders-show-action-btn orders-show-dispute-btn">Open Dispute</button>
+                            </form>
+                        </div>
                     @endif
                 @endif
             @endif

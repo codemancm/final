@@ -67,7 +67,20 @@ class VendorController extends Controller
         $totalSales = Orders::where('vendor_id', $user->id)->count();
         $totalDisputes = $user->vendorDisputes()->count();
 
-        return view('vendor.index', compact('totalProducts', 'totalSales', 'totalDisputes'));
+        $totalEarnings = Orders::where('vendor_id', $user->id)->where('status', 'completed')->sum('total');
+        $escrowedBalance = Orders::where('vendor_id', $user->id)->where('status', 'in_escrow')->sum('total');
+
+        $reviews = \App\Models\ProductReviews::whereHas('product', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->get();
+
+        $ratingsSummary = [
+            'positive' => $reviews->where('sentiment', 'positive')->count(),
+            'mixed' => $reviews->where('sentiment', 'mixed')->count(),
+            'negative' => $reviews->where('sentiment', 'negative')->count(),
+        ];
+
+        return view('vendor.index', compact('totalProducts', 'totalSales', 'totalDisputes', 'totalEarnings', 'escrowedBalance', 'ratingsSummary'));
     }
 
     /**
@@ -975,5 +988,157 @@ class VendorController extends Controller
             Log::error('Error generating QR code: ' . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * Clone a product.
+     *
+     * @param  \App\Models\Product  $product
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function clone(Product $product)
+    {
+        // Check if the authenticated user owns this product
+        if ($product->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $newProduct = $product->replicate();
+        $newProduct->name = $newProduct->name . ' (Copy)';
+        $newProduct->created_at = now();
+        $newProduct->updated_at = now();
+        $newProduct->save();
+
+        return redirect()->route('vendor.my-products')
+            ->with('success', 'Product cloned successfully.');
+    }
+
+    /**
+     * Display the vendor's wallet.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function wallet()
+    {
+        $user = Auth::user();
+        $wallet = $user->wallet;
+        $transactions = \App\Models\Transaction::where('user_id', $user->id)->latest()->paginate(15);
+        $escrowedBalance = \App\Models\Orders::where('vendor_id', $user->id)->where('status', 'in_escrow')->sum('total');
+        $wallet->escrowed_balance = $escrowedBalance;
+
+        return view('vendor.wallet', compact('wallet', 'transactions'));
+    }
+
+    /**
+     * Show the withdrawal form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showWithdraw()
+    {
+        return view('vendor.wallet-withdraw');
+    }
+
+    /**
+     * Handle a withdrawal request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function withdraw(Request $request)
+    {
+        $request->validate([
+            'address' => 'required|string',
+            'amount' => 'required|numeric|min:0.01',
+            'pgp_2fa' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+
+        // PGP 2FA Challenge
+        if (!\App\Services\PgpService::verify($user, $request->pgp_2fa)) {
+            return back()->with('error', 'Invalid PGP 2FA code.');
+        }
+
+        $wallet = $user->wallet;
+
+        if ($wallet->balance < $request->amount) {
+            return back()->with('error', 'Insufficient balance.');
+        }
+
+        // Process withdrawal
+        try {
+            $result = $this->walletRPC->transfer([
+                'address' => $request->address,
+                'amount' => $request->amount * 1e12, // Convert to atomic units
+                'priority' => 1
+            ]);
+
+            $wallet->balance -= $request->amount;
+            $wallet->save();
+
+            \App\Models\Transaction::create([
+                'user_id' => $user->id,
+                'type' => 'withdrawal',
+                'amount' => -$request->amount,
+                'description' => 'Withdrawal to ' . $request->address,
+            ]);
+
+            return redirect()->route('vendor.wallet')->with('success', 'Withdrawal successful.');
+        } catch (\Exception $e) {
+            Log::error('Withdrawal failed: ' . $e->getMessage());
+            return back()->with('error', 'Withdrawal failed. Please try again later.');
+        }
+    }
+
+    /**
+     * Reply to a product review.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\ProductReviews  $review
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function replyToReview(Request $request, \App\Models\ProductReviews $review)
+    {
+        // Check if the authenticated user owns the product of this review
+        if ($review->product->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'reply_text' => 'required|string|max:1000',
+        ]);
+
+        $review->update(['reply_text' => $request->reply_text]);
+
+        return back()->with('success', 'Reply posted successfully.');
+    }
+
+    /**
+     * Report a product review.
+     *
+     * @param  \App\Models\ProductReviews  $review
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function reportReview(\App\Models\ProductReviews $review)
+    {
+        // Check if the authenticated user owns the product of this review
+        if ($review->product->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $review->update(['reported' => true]);
+
+        return back()->with('success', 'Review reported successfully.');
+    }
+
+    /**
+     * Display the vendor security page.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function security()
+    {
+        return view('vendor.security');
     }
 }

@@ -330,6 +330,8 @@ class CartController extends Controller
             return $item->encrypted_message;
         });
 
+        $expiresAt = now()->addMinutes(config('monero.address_expiration_time', 1440));
+
         return view('cart.checkout', [
             'cartItems' => $cartItems,
             'subtotal' => $subtotal,
@@ -340,7 +342,8 @@ class CartController extends Controller
             'xmrTotal' => $xmrTotal,
             'measurementUnits' => $measurementUnits,
             'hasEncryptedMessage' => $hasEncryptedMessage,
-            'messageItem' => $messageItem
+            'messageItem' => $messageItem,
+            'expiresAt' => $expiresAt,
         ]);
     }
 }

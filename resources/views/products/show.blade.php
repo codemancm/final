@@ -66,6 +66,15 @@
                             Message to Vendor
                         </a>
                     </div>
+
+                    <div class="products-show-report-product">
+                        <form action="{{ route('products.report', $product) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="products-show-report-product-button">
+                                Report Product
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 {{-- Center Column (Product Images) --}}
@@ -279,6 +288,27 @@
                             <div class="products-show-review-content">
                                 {{ $review->review_text }}
                             </div>
+                            @if($review->reply_text)
+                                <div class="products-show-review-reply">
+                                    <strong>Vendor's Reply:</strong>
+                                    <p>{{ $review->reply_text }}</p>
+                                </div>
+                            @endif
+                            @if(Auth::check() && Auth::user()->isVendor() && $review->product->user_id == Auth::id() && !$review->reply_text)
+                                <form action="{{ route('vendor.reviews.reply', $review) }}" method="POST" class="products-show-review-reply-form">
+                                    @csrf
+                                    <div class="form-group">
+                                        <textarea name="reply_text" class="form-control" rows="3" placeholder="Your reply..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm">Reply</button>
+                                </form>
+                            @endif
+                            @if(Auth::check() && Auth::user()->isVendor() && $review->product->user_id == Auth::id())
+                                <form action="{{ route('vendor.reviews.report', $review) }}" method="POST" class="products-show-review-report-form">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger btn-sm">Report</button>
+                                </form>
+                            @endif
                         </div>
                     @endforeach
                 </div>

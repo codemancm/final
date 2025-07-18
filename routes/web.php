@@ -183,6 +183,7 @@ Route::middleware(['auth', CheckBanned::class])->group(function () {
     Route::post('/orders/{uniqueUrl}/mark-completed', [OrdersController::class, 'markAsCompleted'])->name('orders.mark-completed');
     Route::post('/orders/{uniqueUrl}/mark-cancelled', [OrdersController::class, 'markAsCancelled'])->name('orders.mark-cancelled');
     Route::post('/orders/{uniqueUrl}/review/{orderItemId}', [OrdersController::class, 'submitReview'])->name('orders.submit-review');
+    Route::post('/products/{product}/report', [ProductController::class, 'report'])->name('products.report');
     
     // Dispute routes
     Route::get('/disputes', [DisputesController::class, 'index'])->name('disputes.index');
@@ -251,6 +252,7 @@ Route::middleware(['auth', CheckBanned::class])->group(function () {
         Route::get('/admin/disputes/{id}', [DisputesController::class, 'adminShow'])->name('admin.disputes.show');
         Route::post('/admin/disputes/{id}/vendor-prevails', [DisputesController::class, 'resolveVendorPrevails'])->name('admin.disputes.vendor-prevails');
         Route::post('/admin/disputes/{id}/buyer-prevails', [DisputesController::class, 'resolveBuyerPrevails'])->name('admin.disputes.buyer-prevails');
+        Route::post('/admin/disputes/{id}/assign', [DisputesController::class, 'assign'])->name('admin.disputes.assign');
 
         // Admin support request management
         Route::get('/admin/support', [AdminController::class, 'supportRequests'])->name('admin.support.requests');
@@ -290,11 +292,30 @@ Route::middleware(['auth', CheckBanned::class])->group(function () {
         Route::delete('/admin/products/{product}', [AdminController::class, 'destroyProduct'])->name('admin.products.destroy');
         Route::post('/admin/products/{product}/feature', [AdminController::class, 'featureProduct'])->name('admin.products.feature');
         Route::post('/admin/products/{product}/unfeature', [AdminController::class, 'unfeatureProduct'])->name('admin.products.unfeature');
+
+        // Vendor escrow balances
+        Route::get('/admin/vendor-escrow', [AdminController::class, 'vendorEscrowBalances'])->name('admin.vendor-escrow');
+
+        // Reported products
+        Route::get('/admin/reported-products', [AdminController::class, 'reportedProducts'])->name('admin.reported-products');
+
+        // Admin audit log
+        Route::get('/admin/audit-log', [AdminController::class, 'auditLog'])->name('admin.audit-log');
+
+        // PGP key rotation
+        Route::get('/admin/pgp-key-rotation', [AdminController::class, 'showPgpKeyRotation'])->name('admin.pgp-key-rotation');
+        Route::post('/admin/pgp-key-rotation', [AdminController::class, 'rotatePgpKey'])->name('admin.pgp-key-rotation.store');
     });
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('services', ServiceController::class);
 });
+
+Route::post('/monero-webhook', [OrdersController::class, 'moneroWebhook'])->name('monero.webhook');
+
+        // Wallet routes
+        Route::get('/wallet/withdraw', [WalletController::class, 'showWithdraw'])->name('wallet.withdraw.show');
+        Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw.store');
 
     // -------------------------------------------------------------------------
     // Vendor Routes
@@ -338,6 +359,20 @@ Route::middleware(['auth'])->group(function () {
             ->name('vendor.products.edit');
         Route::patch('/vendor/products/{product}', [VendorController::class, 'update'])
             ->name('vendor.products.update');
+        Route::post('/vendor/products/{product}/clone', [VendorController::class, 'clone'])
+            ->name('vendor.products.clone');
+
+        // Wallet routes
+        Route::get('/vendor/wallet', [VendorController::class, 'wallet'])->name('vendor.wallet');
+        Route::get('/vendor/wallet/withdraw', [VendorController::class, 'showWithdraw'])->name('vendor.wallet.withdraw');
+        Route::post('/vendor/wallet/withdraw', [VendorController::class, 'withdraw'])->name('vendor.wallet.withdraw.store');
+
+        // Review routes
+        Route::post('/vendor/reviews/{review}/reply', [VendorController::class, 'replyToReview'])->name('vendor.reviews.reply');
+        Route::post('/vendor/reviews/{review}/report', [VendorController::class, 'reportReview'])->name('vendor.reviews.report');
+
+        // Security routes
+        Route::get('/vendor/security', [VendorController::class, 'security'])->name('vendor.security');
     });
 });
 
