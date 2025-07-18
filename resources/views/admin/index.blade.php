@@ -28,6 +28,50 @@
             </div>
         </div>
 
+        <div class="statistics-section">
+            <h2 class="statistics-title">Overview Panel</h2>
+            <div class="statistics-grid">
+                <div class="statistic-card">
+                    <div class="statistic-card-title">XMR Volume (24h)</div>
+                    <div class="statistic-card-value">{{ number_format($dashboardStats['xmr_transaction_volume']['daily'], 5) }} XMR</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">XMR Volume (7d)</div>
+                    <div class="statistic-card-value">{{ number_format($dashboardStats['xmr_transaction_volume']['weekly'], 5) }} XMR</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">XMR Volume (30d)</div>
+                    <div class="statistic-card-value">{{ number_format($dashboardStats['xmr_transaction_volume']['monthly'], 5) }} XMR</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Total in Escrow</div>
+                    <div class="statistic-card-value">{{ number_format($dashboardStats['escrow_status']['total_escrowed'], 5) }} XMR</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Open Disputes</div>
+                    <div class="statistic-card-value">{{ $dashboardStats['disputes']['open'] }}</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Resolved Disputes</div>
+                    <div class="statistic-card-value">{{ $dashboardStats['disputes']['resolved'] }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="statistics-section">
+            <h2 class="statistics-title">System Health</h2>
+            <div class="statistics-grid">
+                <div class="statistic-card">
+                    <div class="statistic-card-title">Server Load</div>
+                    <div class="statistic-card-value">{{ $systemHealth['server_load'] }}</div>
+                </div>
+                <div class="statistic-card">
+                    <div class="statistic-card-title">TOR Mirrors</div>
+                    <div class="statistic-card-value">{{ $systemHealth['tor_mirrors'] }}</div>
+                </div>
+            </div>
+        </div>
+
         <div class="a-v-panel-grid">
             <div class="a-v-panel-item">
                 <h3 class="a-v-panel-item-title">User Management</h3>

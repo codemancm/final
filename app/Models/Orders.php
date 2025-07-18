@@ -468,7 +468,7 @@ class Orders extends Model
     /**
      * Mark the order as sent.
      */
-    public function markAsSent()
+    public function markAsSent($trackingNumber = null)
     {
         if ($this->status !== self::STATUS_PAYMENT_RECEIVED) {
             return false;
@@ -477,6 +477,7 @@ class Orders extends Model
         $this->status = self::STATUS_PRODUCT_SENT;
         $this->is_sent = true;
         $this->sent_at = now();
+        $this->tracking_number = $trackingNumber;
         $this->save();
 
         return true;

@@ -78,6 +78,10 @@
                 </div>
                 
                 <div class="orders-show-actions">
+            @elseif($sale->status === 'product_sent')
+                <div class="orders-show-status-explanation">
+                    <p>This order will be automatically marked as completed in <strong>{{ $sale->getAutoCompleteDeadline()->diffForHumans() }}</strong>.</p>
+                </div>
                     {{-- Delivery text input form --}}
                     <form action="{{ route('vendor.sales.update-delivery-text', $sale->unique_url) }}" method="POST" class="sales-show-delivery-form">
                         @csrf
@@ -109,7 +113,11 @@
 
                     <form action="{{ route('orders.mark-sent', $sale->unique_url) }}" method="POST" class="sales-show-deliver-form">
                         @csrf
-                        <button type="submit" class="orders-show-action-btn sales-show-deliver-btn">Deliver Products</button>
+                        <div class="form-group">
+                            <label for="tracking_number">Tracking Number</label>
+                            <input type="text" name="tracking_number" id="tracking_number" class="form-control">
+                        </div>
+                        <button type="submit" class="orders-show-action-btn sales-show-deliver-btn">Mark as Shipped</button>
                     </form>
                 </div>
             @endif
@@ -168,6 +176,12 @@
                 <div class="orders-show-info-item">
                     <div class="orders-show-info-label">Buyer</div>
                     <div class="orders-show-info-value">{{ $sale->user->username }}</div>
+                </div>
+                <div class="orders-show-info-item">
+                    <div class="orders-show-info-label">Buyer's PGP Key</div>
+                    <div class="orders-show-info-value">
+                        <textarea readonly class="orders-show-message-textarea">{{ $sale->user->pgp_key }}</textarea>
+                    </div>
                 </div>
                 <div class="orders-show-info-item">
                     <div class="orders-show-info-label">Subtotal</div>

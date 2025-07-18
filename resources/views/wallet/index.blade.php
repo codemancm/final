@@ -16,7 +16,7 @@
 
                         <h4>{{ __('Deposit') }}</h4>
                         <p>{{ __('Your Monero Deposit Address') }}:</p>
-                        <code>{{ $wallet->monero_address }}</code>
+                        <code>{{ $wallet->deposit_address }}</code>
                         <br>
                         <a href="{{ route('wallet.generate-address') }}" class="btn btn-primary mt-2">{{ __('Generate New Address') }}</a>
 

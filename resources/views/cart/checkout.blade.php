@@ -95,6 +95,10 @@
                                 @endif
                             </div>
                         </div>
+                        <div class="cart-checkout-summary-row">
+                            <span>Expires in</span>
+                            <span id="countdown-timer"></span>
+                        </div>
                     </div>
                 </div>
 

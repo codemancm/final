@@ -2,6 +2,27 @@
 
 @section('content')
 
+<div class="user-dashboard-info">
+    <div class="user-dashboard-info-card">
+        <div class="user-dashboard-info-item">
+            <span class="user-dashboard-info-label">Current Orders:</span>
+            <span class="user-dashboard-info-value">{{ $currentOrders }}</span>
+        </div>
+        <div class="user-dashboard-info-item">
+            <span class="user-dashboard-info-label">Wallet Balance:</span>
+            <span class="user-dashboard-info-value">{{ number_format($walletBalance, 5) }} XMR</span>
+        </div>
+        <div class="user-dashboard-info-item">
+            <span class="user-dashboard-info-label">Active Disputes:</span>
+            <span class="user-dashboard-info-value">{{ $activeDisputes }}</span>
+        </div>
+        <div class="user-dashboard-info-item">
+            <span class="user-dashboard-info-label">New Messages:</span>
+            <span class="user-dashboard-info-value">{{ $newMessages }}</span>
+        </div>
+    </div>
+</div>
+
 @if($popup)
 <input type="checkbox" id="pop-up-toggle" checked>
 <div class="pop-up-container">

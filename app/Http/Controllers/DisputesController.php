@@ -156,9 +156,13 @@ class DisputesController extends Controller
     public function adminShow($id)
     {
         $dispute = Dispute::with(['order', 'order.user', 'order.vendor', 'messages.user'])->findOrFail($id);
+        $admins = \App\Models\User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })->get();
         
         return view('admin.disputes.show', [
-            'dispute' => $dispute
+            'dispute' => $dispute,
+            'admins' => $admins,
         ]);
     }
 
@@ -255,5 +259,30 @@ class DisputesController extends Controller
         return view('vendor.disputes.show', [
             'dispute' => $dispute
         ]);
+    }
+
+    /**
+     * Assign a dispute to an admin.
+     */
+    public function assign(Request $request, $id)
+    {
+        $dispute = Dispute::findOrFail($id);
+
+        // Ensure dispute is active
+        if ($dispute->status !== Dispute::STATUS_ACTIVE) {
+            return redirect()->route('admin.disputes.show', $dispute->id)
+                ->with('error', 'This dispute has already been resolved.');
+        }
+
+        // Validate the request
+        $validated = $request->validate([
+            'admin_id' => 'required|exists:users,id',
+        ]);
+
+        // Assign the dispute
+        $dispute->update(['admin_id' => $validated['admin_id']]);
+
+        return redirect()->route('admin.disputes.show', $dispute->id)
+            ->with('success', 'Dispute assigned successfully.');
     }
 }

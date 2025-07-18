@@ -281,7 +281,7 @@ class OrdersController extends Controller
     /**
      * Mark the order as sent.
      */
-    public function markAsSent($uniqueUrl)
+    public function markAsSent(Request $request, $uniqueUrl)
     {
         $order = Orders::findByUrl($uniqueUrl);
         
@@ -294,7 +294,11 @@ class OrdersController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        if ($order->markAsSent()) {
+        $validated = $request->validate([
+            'tracking_number' => 'nullable|string|max:255',
+        ]);
+
+        if ($order->markAsSent($validated['tracking_number'])) {
             return redirect()->route('vendor.sales.show', $order->unique_url)
                 ->with('success', 'Product marked as sent. The buyer has been notified.');
         }
@@ -408,7 +412,7 @@ class OrdersController extends Controller
         ]);
 
         // Create the review
-        \App\Models\ProductReviews::create([
+        $review = \App\Models\ProductReviews::create([
             'product_id' => $orderItem->product_id,
             'user_id' => Auth::id(),
             'order_id' => $order->id,
@@ -417,8 +421,32 @@ class OrdersController extends Controller
             'sentiment' => $validated['sentiment'],
         ]);
 
+        // Update vendor reputation
+        \App\Models\ProductReviews::updateVendorReputation($review);
+
         return redirect()->route('orders.show', $order->unique_url)
             ->with('success', 'Your review has been submitted successfully.');
+    }
+
+    /**
+     * Handle the Monero webhook.
+     */
+    public function moneroWebhook(Request $request)
+    {
+        $payload = $request->json()->all();
+
+        if (isset($payload['params']['transfer'])) {
+            $transfer = $payload['params']['transfer'];
+            $address = $transfer['address'];
+
+            $order = Orders::where('payment_address', $address)->first();
+
+            if ($order) {
+                $order->checkPayments($this->walletRPC);
+            }
+        }
+
+        return response()->json(['status' => 'ok']);
     }
 }
 

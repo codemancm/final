@@ -138,4 +138,32 @@ class ProductReviews extends Model
     {
         return $this->created_at->format('Y-m-d');
     }
+
+    /**
+     * Update the vendor's reputation based on the sentiment of the review.
+     *
+     * @param \App\Models\ProductReviews $review
+     * @return void
+     */
+    public static function updateVendorReputation(ProductReviews $review)
+    {
+        $vendor = $review->product->user;
+        $vendorProfile = $vendor->vendorProfile;
+
+        if ($vendorProfile) {
+            $reputation = $vendorProfile->reputation;
+
+            switch ($review->sentiment) {
+                case self::SENTIMENT_POSITIVE:
+                    $reputation += 1;
+                    break;
+                case self::SENTIMENT_NEGATIVE:
+                    $reputation -= 1;
+                    break;
+            }
+
+            $vendorProfile->reputation = $reputation;
+            $vendorProfile->save();
+        }
+    }
 }

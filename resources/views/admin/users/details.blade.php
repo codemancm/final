@@ -18,6 +18,9 @@
                         @endif
                         <p><strong>Last Login:</strong> {{ $user->last_login ? $user->last_login->format('Y-m-d H:i:s') : 'N/A' }}</p>
                         <p><strong>Account Creation Date:</strong> {{ $user->created_at->format('Y-m-d H:i:s') }}</p>
+                        @if($user->hasRole('vendor') && $user->vendorProfile)
+                            <p><strong>Vendor Reputation:</strong> {{ $user->vendorProfile->reputation }}</p>
+                        @endif
                     </div>
                     
                     <form action="{{ route('admin.users.update-roles', $user) }}" method="POST" class="user-details-form">

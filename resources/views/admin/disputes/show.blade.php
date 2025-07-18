@@ -69,6 +69,24 @@
     @if($dispute->status === \App\Models\Dispute::STATUS_ACTIVE)
         <div class="disputes-show-card admin-disputes-show-resolution-card">
             <div>
+                <h2 class="disputes-show-section-title">Assign Dispute</h2>
+                <form action="{{ route('admin.disputes.assign', $dispute->id) }}" method="POST" class="admin-disputes-show-form">
+                    @csrf
+                    <div class="disputes-show-form-group">
+                        <label for="admin_id" class="disputes-show-form-label">Assign to Admin</label>
+                        <select name="admin_id" id="admin_id" class="admin-disputes-show-select">
+                            @foreach($admins as $admin)
+                                <option value="{{ $admin->id }}" {{ $dispute->admin_id == $admin->id ? 'selected' : '' }}>{{ $admin->username }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="admin-disputes-show-vendor-btn">Assign</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="disputes-show-card admin-disputes-show-resolution-card">
+            <div>
                 <h2 class="disputes-show-section-title">Resolve Dispute</h2>
                 <div class="admin-disputes-show-instructions">
                     <p>Please select a resolution for this dispute. This action cannot be undone.</p>

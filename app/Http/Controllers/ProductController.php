@@ -28,7 +28,7 @@ class ProductController extends Controller
     /**
      * Display a listing of all active products with search and filter options.
      */
-    public function index(Request $request)
+    public function index(Request $request, XmrPriceController $xmrPriceController)
     {
         try {
             // Validate all inputs
@@ -38,10 +38,13 @@ class ProductController extends Controller
                 'type' => ['nullable', Rule::in([Product::TYPE_DIGITAL, Product::TYPE_CARGO, Product::TYPE_DEADDROP])],
                 'category' => ['nullable', 'integer', 'exists:categories,id'],
                 'sort_price' => ['nullable', Rule::in(['asc', 'desc'])],
+                'ships_to' => ['nullable', 'string'],
+                'price_min' => ['nullable', 'numeric', 'min:0'],
+                'price_max' => ['nullable', 'numeric', 'min:0'],
             ]);
 
             // Get only filled parameters
-            $filters = collect($request->only(['search', 'vendor', 'type', 'category', 'sort_price']))
+            $filters = collect($request->only(['search', 'vendor', 'type', 'category', 'sort_price', 'ships_to', 'price_min', 'price_max']))
                 ->filter(function ($value) {
                     return $value !== null && $value !== '';
                 })
@@ -102,9 +105,44 @@ class ProductController extends Controller
                 $query->where('category_id', (int) $filters['category']);
             }
 
-            // Apply price sorting
-            if (isset($filters['sort_price'])) {
-                $query->orderBy('price', $filters['sort_price']);
+            if (isset($filters['ships_to'])) {
+                $query->where('ships_to', $filters['ships_to']);
+            }
+
+            $xmrPrice = $xmrPriceController->getXmrPrice();
+            if (is_numeric($xmrPrice) && $xmrPrice > 0) {
+                if (isset($filters['price_min'])) {
+                    $query->where('price', '>=', $filters['price_min'] * $xmrPrice);
+                }
+                if (isset($filters['price_max'])) {
+                    $query->where('price', '<=', $filters['price_max'] * $xmrPrice);
+                }
+            }
+
+            // Apply sorting
+            if (isset($filters['sort_by'])) {
+                switch ($filters['sort_by']) {
+                    case 'price_asc':
+                        $query->orderBy('price', 'asc');
+                        break;
+                    case 'price_desc':
+                        $query->orderBy('price', 'desc');
+                        break;
+                    case 'rating':
+                        $query->withCount(['reviews as positive_reviews' => function ($query) {
+                            $query->where('sentiment', 'positive');
+                        }])->orderBy('positive_reviews', 'desc');
+                        break;
+                    case 'newest':
+                        $query->latest();
+                        break;
+                    case 'popular':
+                        $query->withCount('orders')->orderBy('orders_count', 'desc');
+                        break;
+                    default:
+                        $query->inRandomOrder();
+                        break;
+                }
             } else {
                 // Randomize the order of products if no specific sorting is requested
                 $query->inRandomOrder();
@@ -289,5 +327,15 @@ class ProductController extends Controller
             // If the picture is not found or invalid, return the default picture
             return response()->file(public_path('images/default-product-picture.png'));
         }
+    }
+
+    /**
+     * Report a product.
+     */
+    public function report(Product $product)
+    {
+        $product->update(['reported' => true]);
+
+        return back()->with('success', 'Product reported successfully.');
     }
 }
