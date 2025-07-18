@@ -273,9 +273,8 @@ class AuthController extends Controller
                 'size:16',
                 function ($attribute, $value, $fail) {
                     if ($value !== null) {
-                        $validReference = User::all()->contains(function ($user) use ($value) {
-                            return $user->reference_id === $value;
-                        });
+                        $encryptedValue = Crypt::encryptString($value);
+                        $validReference = User::where('reference_id', $encryptedValue)->exists();
 
                         if (!$validReference) {
                             $fail('Invalid reference number.');
@@ -396,9 +395,8 @@ class AuthController extends Controller
         // Find referrer if reference code was provided
         $referrerId = null;
         if ($request->has('reference_code')) {
-            $referrer = User::all()->first(function ($user) use ($request) {
-                return $user->reference_id === $request->reference_code;
-            });
+            $encryptedCode = Crypt::encryptString($request->reference_code);
+            $referrer = User::where('reference_id', $encryptedCode)->first();
             if ($referrer) {
                 $referrerId = $referrer->id;
             }
@@ -479,6 +477,13 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
         $user->update(['last_login' => now()]);
+
+        if ($user->hasRole('superadmin') || $user->hasRole('admin')) {
+            return redirect()->route('admin.index');
+        } elseif ($user->hasRole('vendor')) {
+            return redirect()->route('vendor.index');
+        }
+
         return redirect()->intended('products');
     }
 
@@ -527,9 +532,17 @@ class AuthController extends Controller
 
         $user = User::whereRaw('BINARY username = ?', [$request->username])->first();
 
-        if (!$user || !$this->verifyMnemonicPhrase($request->mnemonic, $user->mnemonic)) {
+        if (!$user) {
             return back()->with('error', 'Username or mnemonic phrase is incorrect.')
-                ->withInput($request->only('username'));
+                         ->withInput($request->only('username'));
+        }
+
+        // Temporarily decrypt mnemonic for verification
+        $decryptedMnemonic = Crypt::decryptString($user->getAttributes()['mnemonic']);
+
+        if (!$this->verifyMnemonicPhrase($request->mnemonic, $decryptedMnemonic)) {
+            return back()->with('error', 'Username or mnemonic phrase is incorrect.')
+                         ->withInput($request->only('username'));
         }
 
         $token = Str::random(64);
@@ -598,10 +611,15 @@ class AuthController extends Controller
             return back()->with('error', $e->validator->errors()->first());
         }
 
-        $user = User::where('password_reset_expires_at', '>', now())->get()
-            ->first(function ($user) use ($request) {
-                return Hash::check($request->token, $user->password_reset_token);
-            });
+        $users = User::where('password_reset_expires_at', '>', now())->get();
+
+        $user = null;
+        foreach ($users as $u) {
+            if (Hash::check($request->token, $u->password_reset_token)) {
+                $user = $u;
+                break;
+            }
+        }
 
         if (!$user) {
             return back()->with('error', 'This password reset token is invalid or has expired.');
