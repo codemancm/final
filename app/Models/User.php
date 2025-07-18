@@ -77,6 +77,14 @@ class User extends Authenticatable
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
         });
+
+        static::created(function (User $user) {
+            // Create a wallet for the user upon registration
+            if (!$user->wallet) {
+                $wallet = new Wallet();
+                $user->wallet()->save($wallet);
+            }
+        });
     }
 
     /**
